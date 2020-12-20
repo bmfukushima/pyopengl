@@ -20,18 +20,21 @@ Startup --> Main Loop   -->  -->  Shutdown
 
 """ Details
 
-Application Stage
-    Initializing the window where graphics will be displayed
+1.) Application Stage
+    - Initializing the window where graphics will be displayed
     - Sends data to the GPU
+        Reading data required for rendering and sending to GPU
+    - Monitor HW for user input
+    - Main Loop
 
-Geometry Processing (vertex shader)
+2.) Geometry Processing (vertex shader)
     - Determine position of each vertex of each shape
 
-Rasterization
+3.) Rasterization
     - Determines which pixels correspond to the geometric shapes
         that will be rendered
 
-Pixel Processing (program shader)
+4.) Pixel Processing (program shader)
     determines the color of each pixel in the rendered image.
 
 #############################
