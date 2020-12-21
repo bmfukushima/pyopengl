@@ -1,10 +1,9 @@
 
-#############################
+
 #        HIGH LEVEL
-#############################
 """ Overview
 
-1.) Create Display Window
+1.) Application (Create Display Window)
 2.) Process Geometry
 3.) Rasterize
 4.) Render
@@ -37,18 +36,16 @@ Startup --> Main Loop   -->  -->  Shutdown
 4.) Pixel Processing (program shader)
     determines the color of each pixel in the rendered image.
 
-#############################
+
     Application Stage
-#############################
+
 Needs to create display window for OpenGL, and start the main event loop.
 
 The main event loop is going to handle the lions portion of the OpenGL calls
 """
 
 
-#############################
 #        DATA TRANSFER
-#############################
 """ Overview
 
 Passing data between stages of the pipeline
@@ -69,10 +66,19 @@ Passing data between stages of the pipeline
 """
 
 
-#############################
-#    GEOMETRY PROCESSING
-#############################
+#       APPLICATION
 """
+CPU Portion before sending to GPU
+"""
+
+
+#    GEOMETRY PROCESSING
+"""
+Evaluation of curved surface
+Transform, projection
+clipping, culling, primitive assembly
+Lighting / Colors (per vertex)
+
 ## SHADERS
 1.) Create Shader
 2.) Link source code
@@ -95,9 +101,23 @@ glDeleteShader(shaderRef)
 """
 
 
-#############################
+#       RASTERIZATION
+"""
+for each triangle:
+    for fragment in triangle:
+        for pixel in fragment:
+            pixel_color = color
+Which fragments is it going to color
+What color is each fragment
+
+Texture 
+transformation/projection
+mapping
+filtering
+
+"""
+
 #      SHADER PROGRAMS
-#############################
 """
 Groups of shaders (Vertex, Tessellation, Geometry, Fragment).  Usually just Vertex + Fragment.
 
@@ -109,9 +129,7 @@ glLinkProgram(program)
 """
 
 
-#############################
 #        APPLICATIONS
-#############################
 """
 1.) What program to use
 2.) What data to use
@@ -121,4 +139,40 @@ glUseProgram(program)
 glDrawArrays(draw_mode, first_index, index_count)
     
 glPointSize(size)
+"""
+
+
+#        STATES
+"""
+- {color: (1.0, 1.0, 1.0, 1.0), xform: 4x4Matrix}
+- Can run multiple states in the main loop.
+    ie a group of triangles could be running one state, while another group
+        of primitvies is running another state.
+- Good for storing data for later use.  As states will essentially layer on top of each other
+    until the state is overridden.
+        Resources
+            Fonts | Textures
+        Attrs
+            Appearance: lights, materials, colors
+            Transformation: camera, model, texture
+            Options: constant per-frame
+            
+"""
+
+
+#       DESIGN DECISIONS
+"""
+ImmediateMode
+Ordered
+Has States
+Triangle as primitive
+Framebuffer
+"""
+
+#       ETC
+"""
+Textures are per fragment
+Colors are per vertex
+    Lighting conditions wont change over a triangle as it is flat.  So you can do a
+    smaller calculation, and then compute the blending average.
 """
