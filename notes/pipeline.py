@@ -50,7 +50,8 @@ The main event loop is going to handle the lions portion of the OpenGL calls
 
 Passing data between stages of the pipeline
 * Uses TYPE MODIFIERS
-    type modifers are essentially hard coded keyword args
+    type modifiers are essentially hard coded keyword args which are used to pass arbitrary
+    data between steps in the Graphics Pipeline
 
     in (vertex): values supplied from a BUFFER
     in (fragment): values supplied from VERTEX SHADER
@@ -59,7 +60,7 @@ Passing data between stages of the pipeline
     out (fragment): values stored in color buffer (color, depth, stencil)
     outputs MUST define specific outputs for VERTEX/FRAGMENT shaders
         Vertex
-            gl_position = vec4(0.0, 0.0, 0.0, 1.0)
+            gl_Position = vec4(0.0, 0.0, 0.0, 1.0)
         Fragment
             gl_FragColor = vec4(0.5, 0.5, 0.5, 1.0)
 
