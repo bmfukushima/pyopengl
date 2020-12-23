@@ -15,6 +15,10 @@ Startup --> Main Loop   -->  -->  Shutdown
                 ^        | --> Yes
                 ^        | --> No --> Update --> Render
                 ^--  <--  <--  <--  <--  <--  <--|
+
+1.) Vertex Buffer (Buffer, or array of memory)
+2.) Convert Buffer to GPU VRAM
+3.) Draw from VRAM
 """
 
 """ Details

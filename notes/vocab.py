@@ -1,7 +1,6 @@
 """
-Buffer (data/memory buffer): Memory that serves as temp storage for data while being moved.
-
-    Stored as an array of arbitrary data.  A buffer of a 10x10 image would be an array of size 100.
+Vertex Buffer (data/memory buffer): Memory that serves as temp storage for data while being moved.
+    Can be considered just a buffer which stores as an array of arbitrary data.  A buffer of a 10x10 image would be an array of size 100.
 Fragment (array): of pixels that form a triangle/primitive of arbitrary size (image coordinates).
 
     Fragments are created during the rasterization process, and can be discarded.
@@ -32,7 +31,7 @@ Raster (array): of pixels, a 100x100 image is an array of length 10,000
 Rasterization (process): of determining which pixels correspond to which
     points/vertexes during the rendering process
 Rendering (process): of generating a 2D image from a 3D scene
-
+Shader (process): that is run on GPU (aka a function/program)
 Vertex Array Object
     |-* Vertex Buffer Objects
     |       |-* Vertex Attributes
