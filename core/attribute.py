@@ -48,7 +48,9 @@ class Attribute(object):
 
     def associateReference(self, program, variable_name):
         """
-        Associates a variable in the GPU program with this buffer
+        Creates the reference between this attribute and the currently bound buffer.
+
+        create variable reference --> create pointer to data --> stream data from pointer to the GPU
         :param program:
         :param variable_name:
         :return:

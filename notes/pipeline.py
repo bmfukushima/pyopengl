@@ -103,6 +103,9 @@ glGetShaderiv (shaderRef, shaderInfo)
     shaderInfo (GL_SHADER_TYPE | GL_COMPILE_STATUS)
 glGetShaderInfoLog (shaderRef)
 glDeleteShader(shaderRef)
+
+# layout attributes
+# run program
 """
 
 
@@ -126,24 +129,20 @@ filtering
 """
 Groups of shaders (Vertex, Tessellation, Geometry, Fragment).  Usually just Vertex + Fragment.
 
+# setup program
 Create Program --> Attach Shaders --> Link Program
 
 glCreateProgram(): returns program
 glAttachShader(program)
 glLinkProgram(program)
-"""
 
 
-#        APPLICATIONS
-"""
-1.) What program to use
-2.) What data to use
-3.) Draw Mode
+# use program
+Set extra attrs --> Set Program --> Draw Primitives
 
+glPointSize(size)
 glUseProgram(program)
 glDrawArrays(draw_mode, first_index, index_count)
-    
-glPointSize(size)
 """
 
 
