@@ -1,4 +1,28 @@
 """
+Draw Types (GL_DRAWTYPE):
+    GL_POINTS | GL_LINE | GL_LINE_LOOP | GL_TRIANGLE | GL_TRIANGLE_FAN
+    GL_LINE_LOOP: Connects the indexes in sequence
+        0 --> 1 --> 2 --> 3
+    GL_LINES: Connects the indexes as lines
+        0 --> 1
+        2 --> 3
+        4 --> 5
+    GL_TRIANGLES: Connects in batches of 3 indexes to form a triangle
+        | <--> 1         | <--> 4
+        0      |         3      |
+        | <--> 2         | <--> 5
+    GL_TRIANGLE_FAN: Connects indexes to 0th index in the form of a triangle/fan
+        | <-- -- -- -- -- --> 7
+        | <-- -- -- -- --> 6
+        | <-- -- -- --> 5
+        | <-- -- --> 4
+        | <-- --> 3
+        | <--> 2
+        | < 1
+        0
+
+
+    GL_POLYGON?
 
 Fragment (array): of pixels that form a triangle/primitive of arbitrary size (image coordinates).
 
@@ -33,6 +57,7 @@ Rendering (process): of generating a 2D image from a 3D scene
 Shader (process): that is run on GPU (aka a function/program)
 
 Vertex Array Object
+    A way to setup reusable templates for Vertex Buffers Layouts
     |-* Vertex Buffer Objects
     |       |-* Vertex Attributes
     |-- Texture Buffer Objects
@@ -46,6 +71,7 @@ Vertex Buffer (data/memory buffer): Memory that serves as temp storage for data 
             ie. A buffer of a 10x10 image would be an array of size 100.
     - Each individual portion/type of data in the buffer is called an attribute
             ie. {points}{normals}{colors}
+            ie. vertexBuffer = [[attr1], [attr2], [att3]]
         the order of operations of the attributes is called the
         VERTEX ATTRIBUTE LAYOUT and can be defined with the <glVertexAttribPointer> call
 
