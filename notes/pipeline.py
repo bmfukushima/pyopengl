@@ -49,6 +49,11 @@ The main event loop is going to handle the lions portion of the OpenGL calls
 """
 
 
+#       CLEAR BUFFER
+"""
+See vocab --> FrameBuffer
+"""
+
 #        DATA TRANSFER
 """ 
 See glsl.py --> TYPE MODIFIERS

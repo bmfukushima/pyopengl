@@ -116,7 +116,7 @@ class MinimalGLWidget(QOpenGLWidget):
 
     def __init__(self, parent=None, draw_stride=0, draw_type=GL_POINTS):
         super(MinimalGLWidget, self).__init__(parent)
-        self._update_list = []
+        self._object_list = []
         self._draw_stride = draw_stride
         self._draw_type = draw_type
 
@@ -222,7 +222,7 @@ class MinimalGLWidget(QOpenGLWidget):
         # if not self.isValid():
         #     return
         # draw call
-        for vao in self._update_list:
+        for vao in self._object_list:
             glBindVertexArray(vao)
             glDrawArrays(self.drawType(), 0, self.drawStride())
 
@@ -275,7 +275,7 @@ class MinimalGLWidget(QOpenGLWidget):
         # setup draw attrs
         self.setDrawType(primitive_type)
         self.setDrawStride(stride)
-        self._update_list = vao_list
+        self._object_list = vao_list
 
         # START STATE UPDATE
         self.makeCurrent()

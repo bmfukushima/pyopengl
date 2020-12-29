@@ -18,8 +18,10 @@ Attribute / VAO
 """
 import logging
 import numpy
+
 from OpenGL.GL import (
     glDetachShader,
+    glViewport,
     glEnableVertexAttribArray,
     glGenBuffers,
     glGetAttribLocation,
@@ -54,19 +56,25 @@ from OpenGL.GL import (
     GL_LINE_LOOP,
     GL_COMPILE_STATUS,
     GL_VERTEX_SHADER,
-    GL_FRAGMENT_SHADER
+    GL_FRAGMENT_SHADER,
+    glMatrixMode,
+    glLoadIdentity,
+    glOrtho,
+    glMatrixMode,
+    GL_PROJECTION,
+    GL_MODELVIEW
 )
 #import OpenGL as gl
 from PyQt5.QtWidgets import QApplication, QOpenGLWidget
 from PyQt5.QtGui import QOpenGLWindow, QOpenGLVertexArrayObject
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QPointF
 
 
 logger = logging.getLogger(__name__)
 
 
 vertex_code = '''
-attribute vec2 position;
+attribute vec3 position;
 void main()
 {
   gl_Position = vec4(0.0, 0.5, 0.0, 1.0);
@@ -90,45 +98,76 @@ class MinimalGLWidget(QOpenGLWidget):
             This sets the glDrawArrays stride value.
         draw_type (GL_DRAW_TYPE):
             GL_POINTS, GL_LINE_LOOP, GL_TRIANGLE_FAN, GL_TRIANGLES
+        _resizing (bool): determines if this widget is currently being resized or not
+        _object_list (list): of all currently active VAO's to be drawn by the paintGL call
 
     Notes:
         - update() calls the paintGL function
+        - resizeEvent() --> resizeGL() --> paintGL()
+            resizeEvent is doing a glClear, and this is very hard to start =\
+                UPDATE BEHAVIOR by default is to clear on paintGL
+                use "setUpdateBehavior(PartialUpdate | NoPartialUpdate)"
+                    PartialUpdate is default
         - for some reason the paintGL runs twice on init
-        - update behavior by default is to clear on paintGL
-            use "setUpdateBehavior(PartialUpdate | NoPartialUpdate)"
-                PartialUpdate is default
+
         -
     """
     # vertex shader
     VERTEX_SHADER_DEFAULT = """
             in vec3 position;
+            in vec3 vertex_color;
+            out vec3 color;
             void main()
             {
                 gl_Position = vec4(position, 1.0);
+                color = vertex_color;
             }
             """
     FRAGMENT_SHADER_DEFAULT = """
+            in vec3 color;
             void main()
             {
-                gl_FragColor = vec4(1.0, 0.5, 1.0, 1.0);
+                gl_FragColor = vec4(color, 1.0);
+                //gl_FragColor = vec4(1.0, 0.5, 1.0, 1.0);
             }
             """
 
     def __init__(self, parent=None, draw_stride=0, draw_type=GL_POINTS):
         super(MinimalGLWidget, self).__init__(parent)
-        self._update_list = []
+        self._global_object_list = []
+        self._object_list = []
+        #self._resizing = False
         self._draw_stride = draw_stride
         self._draw_type = draw_type
 
         # UPDATE PROGRAM
+        self.resized.connect(self.test)
+
+    def test(self):
+        print('yolo')
 
     # todo move creation of primitives into this
-    def createPolygon(self, points_list=[[]]):
+    def createPolygon(self, points_list, colors_list=None):
+
+        # make current
+        self.makeCurrent()
+
+        # generate VAO and set as ACTIVE
         polygon_vao = glGenVertexArrays(1)
         glBindVertexArray(polygon_vao)
 
-        polygon_attr = Attribute("vec3", points_list)
-        polygon_attr.associateReference(self.program(), "position")
+        # setup POINTS
+        pos_attr = Attribute("vec3", points_list)
+        pos_attr.associateReference(self.program(), "position")
+
+        # setup COLOR
+        col_attr = Attribute("vec3", colors_list)
+        col_attr.associateReference(self.program(), "vertex_color")
+
+        # Todo Why does this cause the original draw to disappear?
+        #
+        #self.doneCurrent()
+        # return
         return polygon_vao
 
     def createQuad(self):
@@ -176,6 +215,11 @@ class MinimalGLWidget(QOpenGLWidget):
         triangle_attr = Attribute("vec3", position_data)
         triangle_attr.associateReference(self.program(), "position")
         self.triangle_length = len(position_data)
+
+        triangle_color = Attribute("vec3", position_data)
+        triangle_color.associateReference(self.program(), "vertex_color")
+        #self.triangle_length = len(position_data)
+
         return triangle_vao
 
     def initializeGL(self):
@@ -191,9 +235,22 @@ class MinimalGLWidget(QOpenGLWidget):
         program = MinimalGLWidget.initializeProgram()
         self.setProgram(program)
 
+        # CREATE PRIMITIVES
         self.quad = self.createQuad()
         self.triangle = self.createTriangle()
 
+        # polygon
+        points = [
+            [-0.5, 0.5, 0.0],
+            [-0.8, 0.8, 0.0],
+            [-0.2, 0.8, 0.0],
+        ]
+        colors = [
+            [0.5, 0.5, 1.0],
+            [0.5, 1.0, 0.5],
+            [1.0, 0.5, 0.5],
+        ]
+        self.poly = self.createPolygon(points_list=points, colors_list=colors)
         # why did they detach the shader?
         # will need to shaders from program?
         #glDetachShader(program, vertex)
@@ -201,63 +258,105 @@ class MinimalGLWidget(QOpenGLWidget):
 
         glPointSize(20)
         #self.update([self.quad, self.triangle], stride=4)
-        for object in [self.triangle, self.quad]:
-            self.update(
-                [object],
-                stride=3,
-                primitive_type=GL_POINTS
-            )
-        #self.update([self.triangle], stride=3)
-
-    # def paintGL(self):
-    #     print('paint')
-    #     pass
+        # for object in [self.triangle, self.quad]:
+        #     self.update(
+        #         [object],
+        #         stride=3,
+        #         primitive_type=GL_POINTS
+        #     )
+        self.update([self.quad, self.triangle], stride=3)
 
     def paintGL(self):
         """
         Has to be called to send signal to draw to OpenGL?
         :return:
         """
+        # preflight
+        #self.setUpdateBehavior(QOpenGLWidget.PartialUpdate)
+        # if self._resizing == True:
+        #     self.doneCurrent()
+        #     return
         print('--> paintGL')
+
         # if not self.isValid():
         #     return
+        # this is being called in "update"
+        # this call only works when initializing... not sure why =\
         # draw call
-        for vao in self._update_list:
+        print(self._global_object_list)
+        # this is drawing them on top of each other, due to new shaders
+        for vao in self._global_object_list:
             glBindVertexArray(vao)
             glDrawArrays(self.drawType(), 0, self.drawStride())
 
         return QOpenGLWidget.paintGL(self)
 
+    # def resizeGL(self, width, height):
+    #     print('resize GL')
+    #     # self._resizing = True
+    #     # self._object_list = self._global_object_list
+    #     # print("object liset === ", self._object_list)
+    #     return QOpenGLWidget.resizeGL(self, width, height)
+    #
+    # def resizeEvent(self, event):
+    #     # This will block the clear event...
+    #     #self.res
+    #     print('resize event')
+    #     return self.resizeGL(self.width(), self.height())
+    #     #return
+    #
+    # def resized(self):
+    #     print('resized')
+    #     self.doneCurrent()
+    #     pass
+    # def aboutToResize(self):
+    #     print('about to resize')
+    #     self.doneCurrent()
+    #     pass
+
     """ EVENTS """
     def keyPressEvent(self, event):
-        print('--> keyPressEvent')
-
         if event.key() == Qt.Key_Q:
-            print ("--> Q Pressed")
-
             vertex_source = """
                 in vec3 position;
+                in vec3 vertex_color;
+                out vec3 color;
                 void main()
                 {
                     gl_Position = vec4(position.x * 0.5, position.y * 0.5, position.z * 0.5, 1.0);
+                    color = vertex_color;
                 }
             """
             fragment_source = """
+                in vec3 color;
                 void main()
                 {
-                    gl_FragColor = vec4(0.0, 0.5, 1.0, 1.0);
+                    gl_FragColor = vec4(color, 1.0);
                 }
             """
-            # todo only draws second call? the same as before =\
-            for object in [self.triangle, self.quad]:
-                self.update(
-                    [object],
-                    stride=3,
-                    primitive_type=GL_LINE_LOOP,
-                    fragment_source_code=fragment_source,
-                    vertex_source_code=vertex_source
-                )
+            # need make current for poly creation /shrug
+            points = [
+                [0.5, -0.5, 0.0],
+                [0.8, -0.8, 0.0],
+                [0.2, -0.8, 0.0],
+            ]
+            colors = [
+                [0.5, 0.5, 1.0],
+                [0.5, 1.0, 0.5],
+                [1.0, 0.5, 0.5],
+            ]
+            #self.makeCurrent()
+            self.another_one = self.createPolygon(points, colors_list=colors)
 
+            self.update(
+                [self.poly, self.another_one],
+                stride=3,
+                clear=False,
+                primitive_type=GL_LINE_LOOP,
+                fragment_source_code=fragment_source,
+                vertex_source_code=vertex_source
+            )
+            #self.doneCurrent()
             # MinimalGLWidget.initializeProgram(fragment_source_code=fragment_source)
             # test_triangle = self.createTriangle()
             # self.update(test_triangle, stride=3, primitive_type=GL_LINE_LOOP)
@@ -272,13 +371,17 @@ class MinimalGLWidget(QOpenGLWidget):
             vertex_source_code=None,
             fragment_source_code=None
         ):
+        # START STATE UPDATE
+        self.makeCurrent()
+
         # setup draw attrs
         self.setDrawType(primitive_type)
         self.setDrawStride(stride)
-        self._update_list = vao_list
 
-        # START STATE UPDATE
-        self.makeCurrent()
+        # update object lists
+        for object in vao_list:
+            self._global_object_list.append(object)
+        self._object_list = vao_list
 
         # clear
         if clear:
@@ -288,23 +391,19 @@ class MinimalGLWidget(QOpenGLWidget):
         if vertex_source_code or fragment_source_code:
             program = self.initializeProgram(vertex_source_code=vertex_source_code, fragment_source_code=fragment_source_code)
             self.setProgram(program)
-            print('program?')
             # TODO how to set up association?
+            # does association even matter??
 
         # bind VAO
-        print('draw????')
         for vao in vao_list:
             glBindVertexArray(vao)
             glDrawArrays(self.drawType(), 0, self.drawStride())
-        #glBindVertexArray(vao_list)
-        #glDrawArrays(primitive_type, 0, stride)
+
         # update
         self.doneCurrent()
 
         # draw
-        #self.paintGL()
         return QOpenGLWidget.update(self)
-        print('end?')
 
     """ PROPERTIES """
     def program(self):
@@ -423,6 +522,7 @@ class MinimalGLWidget(QOpenGLWidget):
         ## FINISH ERROR CHECKING
         return program
 
+
 # TODO Rewatch video...
 # https://www.youtube.com/watch?v=xGIWDgqAJ4Q&list=PLxpdybrffYlPqkCyvvLfvwsaB7CB1r0pV&index=8
 class Attribute(object):
@@ -492,6 +592,7 @@ class Attribute(object):
 
         # indicate data should be streamed to variable from buffer
         glEnableVertexAttribArray(variable_ref)
+
 
 
 

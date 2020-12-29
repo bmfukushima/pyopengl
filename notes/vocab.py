@@ -20,17 +20,15 @@ Draw Types (GL_DRAWTYPE):
         | <--> 2
         | < 1
         0
-
-
     GL_POLYGON?
 
 Fragment (array): of pixels that form a triangle/primitive of arbitrary size (image coordinates).
-
     Fragments are created during the rasterization process, and can be discarded.
     For each pixel, only one fragment will make it to the Frame Buffer (One pixel
     can contain multiple Fragments, even from the same primitive)
 
     Usually take fragments based off of depth buffer.
+
 Fragment Shader (shader): code that is run on each individual fragment that is created during
     the rasterization process.
     - Color
@@ -41,6 +39,7 @@ Fragment Shader (shader): code that is run on each individual fragment that is c
         Opaque
         Transparent Farthest from camera
         Transparent Closest to camera
+
 Frame Buffer (array): Stores pixel related data
 	|-- Color Buffer
 	|	    stores rgb values
@@ -48,12 +47,22 @@ Frame Buffer (array): Stores pixel related data
 	|	    distance from points on scene to camera
 	|-- Stencil Buffer
 		    shadows / reflections / etc
+	Clear/remove data from FrameBuffer
+	    glClearColor(red, green, blue, alpha): Specify RGBA values (0-1) of color used to clear color buffer
+	        This will be the color used to clear the buffer
+	    glClear(mask) Reset the contents of the buffer(s) indicated by <mask> to their default values
+	        typically use GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT
+
 Precision (bit depth): the number of bits used in each pixel
     ie. 8 bit = 2^8 = 256 possible colors
+
 Raster (array): of pixels, a 100x100 image is an array of length 10,000
+
 Rasterization (process): of determining which pixels correspond to which
     points/vertexes during the rendering process
+
 Rendering (process): of generating a 2D image from a 3D scene
+
 Shader (process): that is run on GPU (aka a function/program)
 
 Vertex Array Object
@@ -107,7 +116,6 @@ Vertex Attribute Layout
                 then the pointer would be 8, as you need to travel 8 bytes into each
                 vertex in order to start he UV coordinates
             cpp --> (const void*)8
-
 
 Vertex Shader
     - Primary purpose is to determine FINAL position
