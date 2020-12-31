@@ -17,17 +17,8 @@ Attribute / VAO
     Should be combined together into one object type
 """
 import logging
-import numpy
 
 from OpenGL.GL import (
-    glDetachShader,
-    glViewport,
-    glEnableVertexAttribArray,
-    glGenBuffers,
-    glGetAttribLocation,
-    glBindBuffer,
-    glBufferData,
-    glVertexAttribPointer,
     glGenVertexArrays,
     glBindVertexArray,
     glUseProgram,
@@ -48,53 +39,27 @@ from OpenGL.GL import (
     glClear,
     GL_COLOR_BUFFER_BIT,
     GL_LINK_STATUS,
-    GL_INT,
-    GL_FLOAT,
-    GL_ARRAY_BUFFER,
-    GL_STATIC_DRAW,
     GL_POINTS,
     GL_LINE_LOOP,
     GL_COMPILE_STATUS,
     GL_VERTEX_SHADER,
     GL_FRAGMENT_SHADER,
-    glMatrixMode,
-    glLoadIdentity,
-    glOrtho,
-    glMatrixMode,
-    GL_PROJECTION,
-    GL_MODELVIEW
 )
-#import OpenGL as gl
-from PyQt5.QtWidgets import QApplication, QOpenGLWidget
-from PyQt5.QtGui import QOpenGLWindow, QOpenGLVertexArrayObject
-from PyQt5.QtCore import Qt, QPointF
 
+from PyQt5.QtWidgets import QApplication, QOpenGLWidget
+# from PyQt5.QtGui import QOpenGLWindow, QOpenGLVertexArrayObject
+from PyQt5.QtCore import Qt, QPoint
+
+from core.attribute import Attribute
+from core.uniform import Uniform
 
 logger = logging.getLogger(__name__)
-
-
-vertex_code = '''
-attribute vec3 position;
-void main()
-{
-  gl_Position = vec4(0.0, 0.5, 0.0, 1.0);
-}
-'''
-
-
-fragment_code = '''
-void main()
-{
-  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-}
-'''
 
 
 class MinimalGLWidget(QOpenGLWidget):
     """
     Args:
         draw_stride (int): How many points are in the primitive type to be drawn.
-
             This sets the glDrawArrays stride value.
         draw_type (GL_DRAW_TYPE):
             GL_POINTS, GL_LINE_LOOP, GL_TRIANGLE_FAN, GL_TRIANGLES
@@ -116,10 +81,13 @@ class MinimalGLWidget(QOpenGLWidget):
     VERTEX_SHADER_DEFAULT = """
             in vec3 position;
             in vec3 vertex_color;
+            uniform vec3 translation;
             out vec3 color;
+
             void main()
             {
-                gl_Position = vec4(position, 1.0);
+                vec3 pos = position + translation;
+                gl_Position = vec4(pos, 1.0);
                 color = vertex_color;
             }
             """
@@ -143,6 +111,8 @@ class MinimalGLWidget(QOpenGLWidget):
         # UPDATE PROGRAM
         self.resized.connect(self.test)
 
+        # UNIFORMS
+
     def test(self):
         print('yolo')
 
@@ -161,66 +131,18 @@ class MinimalGLWidget(QOpenGLWidget):
         pos_attr.associateReference(self.program(), "position")
 
         # setup COLOR
-        col_attr = Attribute("vec3", colors_list)
-        col_attr.associateReference(self.program(), "vertex_color")
+        if colors_list:
+            col_attr = Attribute("vec3", colors_list)
+            col_attr.associateReference(self.program(), "vertex_color")
+
+        # self.user_translation.locateVariable(self.program(), "translation")
+        #self.user_translation.uploadData()
 
         # Todo Why does this cause the original draw to disappear?
         #
         #self.doneCurrent()
         # return
         return polygon_vao
-
-    def createQuad(self):
-
-        # generate VAO
-        quad_vao = glGenVertexArrays(1)
-
-        # bind VAO
-        glBindVertexArray(quad_vao)
-
-        position_data = [
-            [-0.4, -0.4, 0.0],
-            [-0.8, -0.2, 0.0],
-            [-0.2, -0.2, 0.0],
-            [-0.2, -0.8, 0.0]
-
-        ]
-        # create attr
-        quad_attr = Attribute("vec3", position_data)
-        quad_attr.associateReference(self.program(), "position")
-        self.quad_length = 4
-        return quad_vao
-
-    def createTriangle(self):
-        """
-        Creates a VAO of a triangle
-
-        Returns: (VAO)
-        """
-        # need some sort of object class to track
-        # initialize VAO
-        triangle_vao = glGenVertexArrays(1)
-
-        # bind VAO to be current
-        glBindVertexArray(triangle_vao)
-
-        # setup points
-        position_data = [
-            [0.8, 0.8, 0.0],
-            [0.8, 0.2, 0.0],
-            [0.2, 0.2, 0.0]
-        ]
-
-        # create attr
-        triangle_attr = Attribute("vec3", position_data)
-        triangle_attr.associateReference(self.program(), "position")
-        self.triangle_length = len(position_data)
-
-        triangle_color = Attribute("vec3", position_data)
-        triangle_color.associateReference(self.program(), "vertex_color")
-        #self.triangle_length = len(position_data)
-
-        return triangle_vao
 
     def initializeGL(self):
         """
@@ -235,9 +157,31 @@ class MinimalGLWidget(QOpenGLWidget):
         program = MinimalGLWidget.initializeProgram()
         self.setProgram(program)
 
+        #self.user_translation = Uniform("vec3", [-0.5, 0.0, 0.0])
+        self.user_translation = Uniform("vec3", [0.0, 0.0, 0.0])
+        self.user_translation.locateVariable(program, "translation")
+
+        colors = [
+            [1.0, 0.5, 0.5],
+            [0.5, 1.0, 0.5],
+            [0.5, 0.5, 1.0]
+        ]
+
         # CREATE PRIMITIVES
-        self.quad = self.createQuad()
-        self.triangle = self.createTriangle()
+        points = [
+            [0.8, 0.8, 0.0],
+            [0.8, 0.2, 0.0],
+            [0.2, 0.2, 0.0]
+        ]
+        self.triangle0 = self.createPolygon(points, colors_list=colors)
+
+        points = [
+            [-0.4, -0.4, 0.0],
+            [-0.8, -0.2, 0.0],
+            [-0.2, -0.2, 0.0]
+
+        ]
+        self.triangle1 = self.createPolygon(points, colors_list=colors)
 
         # polygon
         points = [
@@ -245,26 +189,16 @@ class MinimalGLWidget(QOpenGLWidget):
             [-0.8, 0.8, 0.0],
             [-0.2, 0.8, 0.0],
         ]
-        colors = [
-            [0.5, 0.5, 1.0],
-            [0.5, 1.0, 0.5],
-            [1.0, 0.5, 0.5],
-        ]
-        self.poly = self.createPolygon(points_list=points, colors_list=colors)
+
+        self.poly = self.createPolygon(points, colors_list=colors)
         # why did they detach the shader?
         # will need to shaders from program?
         #glDetachShader(program, vertex)
         #glDetachShader(program, fragment)
 
         glPointSize(20)
-        #self.update([self.quad, self.triangle], stride=4)
-        # for object in [self.triangle, self.quad]:
-        #     self.update(
-        #         [object],
-        #         stride=3,
-        #         primitive_type=GL_POINTS
-        #     )
-        self.update([self.quad, self.triangle], stride=3)
+
+        self.update([self.triangle0, self.triangle1], draw_stride=3)
 
     def paintGL(self):
         """
@@ -273,20 +207,14 @@ class MinimalGLWidget(QOpenGLWidget):
         """
         # preflight
         #self.setUpdateBehavior(QOpenGLWidget.PartialUpdate)
-        # if self._resizing == True:
-        #     self.doneCurrent()
-        #     return
-        print('--> paintGL')
 
-        # if not self.isValid():
-        #     return
-        # this is being called in "update"
-        # this call only works when initializing... not sure why =\
-        # draw call
         print(self._global_object_list)
         # this is drawing them on top of each other, due to new shaders
         for vao in self._global_object_list:
             glBindVertexArray(vao)
+            #self.user_translation.uploadData()
+            # self.user_translation.locateVariable(self.program(), "translation")
+            #
             glDrawArrays(self.drawType(), 0, self.drawStride())
 
         return QOpenGLWidget.paintGL(self)
@@ -316,57 +244,84 @@ class MinimalGLWidget(QOpenGLWidget):
 
     """ EVENTS """
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Q:
-            vertex_source = """
-                in vec3 position;
-                in vec3 vertex_color;
-                out vec3 color;
-                void main()
-                {
-                    gl_Position = vec4(position.x * 0.5, position.y * 0.5, position.z * 0.5, 1.0);
-                    color = vertex_color;
-                }
-            """
-            fragment_source = """
-                in vec3 color;
-                void main()
-                {
-                    gl_FragColor = vec4(color, 1.0);
-                }
-            """
-            # need make current for poly creation /shrug
-            points = [
-                [0.5, -0.5, 0.0],
-                [0.8, -0.8, 0.0],
-                [0.2, -0.8, 0.0],
-            ]
-            colors = [
-                [0.5, 0.5, 1.0],
-                [0.5, 1.0, 0.5],
-                [1.0, 0.5, 0.5],
-            ]
-            #self.makeCurrent()
-            self.another_one = self.createPolygon(points, colors_list=colors)
+        """
+        Todo: Uniforms
+            why do uniforms just explode...
+        """
+        wasd = [Qt.Key_W, Qt.Key_A, Qt.Key_S, Qt.Key_D]
+        translation_amount = 0.1
+        if event.key() in wasd:
+            # self.makeCurrent()
+            if event.key() == Qt.Key_W:
+                self.user_translation.data[1] += translation_amount
+            elif event.key() == Qt.Key_A:
+                self.user_translation.data[0] -= translation_amount
+            elif event.key() == Qt.Key_S:
+                self.user_translation.data[1] -= translation_amount
+            elif event.key() == Qt.Key_D:
+                self.user_translation.data[0] += translation_amount
 
-            self.update(
-                [self.poly, self.another_one],
-                stride=3,
-                clear=False,
-                primitive_type=GL_LINE_LOOP,
-                fragment_source_code=fragment_source,
-                vertex_source_code=vertex_source
-            )
-            #self.doneCurrent()
-            # MinimalGLWidget.initializeProgram(fragment_source_code=fragment_source)
-            # test_triangle = self.createTriangle()
-            # self.update(test_triangle, stride=3, primitive_type=GL_LINE_LOOP)
-            #self.testDraw()
+            # upload data
+            self.makeCurrent()
+            self.user_translation.uploadData()
+            self.doneCurrent()
+
+            # redraw
+            self.update(self._global_object_list, clear=True)
+
+        if event.key() == Qt.Key_Q:
+            self.user_translation.data = [0.25, 0.25, 0.0]
+
+            self.update(self._global_object_list)
+
+            # vertex_source = """
+            #     in vec3 position;
+            #     in vec3 vertex_color;
+            #     out vec3 color;
+            #     void main()
+            #     {
+            #         gl_Position = vec4(position.x * 0.5, position.y * 0.5, position.z * 0.5, 1.0);
+            #         color = vertex_color;
+            #     }
+            # """
+            # fragment_source = """
+            #     in vec3 color;
+            #     void main()
+            #     {
+            #         gl_FragColor = vec4(color, 1.0);
+            #     }
+            # """
+            # # need make current for poly creation /shrug
+            # points = [
+            #     [0.5, -0.5, 0.0],
+            #     [0.8, -0.8, 0.0],
+            #     [0.2, -0.8, 0.0],
+            # ]
+            # colors = [
+            #     [1.0, 0.5, 0.5],
+            #     [0.5, 1.0, 0.5],
+            #     [0.5, 0.5, 1.0]
+            # ]
+            # #self.makeCurrent()
+            # self.another_one = self.createPolygon(points, colors_list=colors)
+            #
+            # self.update(
+            #     [self.poly, self.another_one],
+            #     stride=3,
+            #     clear=False,
+            #     primitive_type=GL_LINE_LOOP,
+            #     fragment_source_code=fragment_source,
+            #     vertex_source_code=vertex_source
+            # )
+
+
+        return QOpenGLWidget.keyPressEvent(self, event)
 
     def update(
             self,
             vao_list,
-            stride=1,
-            primitive_type=GL_POINTS,
+            draw_stride=None,
+            draw_type=None,
             clear=False,
             vertex_source_code=None,
             fragment_source_code=None
@@ -375,12 +330,15 @@ class MinimalGLWidget(QOpenGLWidget):
         self.makeCurrent()
 
         # setup draw attrs
-        self.setDrawType(primitive_type)
-        self.setDrawStride(stride)
+        if draw_type:
+            self.setDrawType(draw_type)
+        if draw_stride:
+            self.setDrawStride(draw_stride)
 
         # update object lists
         for object in vao_list:
-            self._global_object_list.append(object)
+            if object not in self._global_object_list:
+                self._global_object_list.append(object)
         self._object_list = vao_list
 
         # clear
@@ -521,81 +479,6 @@ class MinimalGLWidget(QOpenGLWidget):
 
         ## FINISH ERROR CHECKING
         return program
-
-
-# TODO Rewatch video...
-# https://www.youtube.com/watch?v=xGIWDgqAJ4Q&list=PLxpdybrffYlPqkCyvvLfvwsaB7CB1r0pV&index=8
-class Attribute(object):
-    """
-    data (array): of arbitrary data
-    data_type (string): what type of data is being used
-        int | float | vec2 | vec3 | vec 4
-
-    """
-    def __init__(self, data_type, data):
-        self.data = data
-        self.data_type = data_type
-
-        # reference to available buffer in GPU
-        self.buffer_res = glGenBuffers(1)
-
-        # upload data
-        self.uploadData()
-
-    def uploadData(self):
-        """
-        Stores data on GPU
-        """
-        # convert to numpy array
-        data = numpy.array(self.data)
-
-        # convert to float32
-        data = data.astype(numpy.float32)
-
-        # select buffer used by following functions
-        glBindBuffer(GL_ARRAY_BUFFER, self.buffer_res)
-
-        # store data in currently bound buffer
-        glBufferData(GL_ARRAY_BUFFER, data.ravel(), GL_STATIC_DRAW)
-
-    def associateReference(self, program, variable_name):
-        """
-        Associates a variable in the GPU program with this buffer
-        :param program:
-        :param variable_name:
-        :return:
-        """
-
-        # get variable reference
-        variable_ref = glGetAttribLocation(program, variable_name)
-
-        # return if no reference found
-        if variable_ref == -1: return
-
-        # select buffer to use
-        glBindBuffer(GL_ARRAY_BUFFER, self.buffer_res)
-
-        # specify how data will be read
-        #   from buffer currently bound to GL_ARRAY_BUFFER
-        if self.data_type == "int":
-            glVertexAttribPointer(variable_ref, 1, GL_INT, False, 0, None)
-        elif self.data_type == "float":
-            glVertexAttribPointer(variable_ref, 1, GL_FLOAT, False, 0, None)
-        elif self.data_type == "vec2":
-            glVertexAttribPointer(variable_ref, 2, GL_FLOAT, False, 0, None)
-        elif self.data_type == "vec3":
-            glVertexAttribPointer(variable_ref, 3, GL_FLOAT, False, 0, None)
-        elif self.data_type == "vec4":
-            glVertexAttribPointer(variable_ref, 4, GL_FLOAT, False, 0, None)
-        else:
-             raise Exception("Unknown data type... {data_type}".format(data_type=self.data_type))
-
-        # indicate data should be streamed to variable from buffer
-        glEnableVertexAttribArray(variable_ref)
-
-
-
-
 
 
 if __name__ == '__main__':
