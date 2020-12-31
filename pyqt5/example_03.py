@@ -44,6 +44,7 @@ from OpenGL.GL import (
     GL_COMPILE_STATUS,
     GL_VERTEX_SHADER,
     GL_FRAGMENT_SHADER,
+    glGetString, GL_VENDOR, GL_RENDERER, GL_VERSION, GL_SHADING_LANGUAGE_VERSION
 )
 
 from PyQt5.QtWidgets import QApplication, QOpenGLWidget
@@ -150,6 +151,7 @@ class MinimalGLWidget(QOpenGLWidget):
         program = MinimalGLWidget.initializeProgram()
         self.setProgram(program)
 
+        MinimalGLWidget.printSystemInfo()
         # UNIFORM | keyboard translation
         self.user_translation = Uniform("vec3", [0.0, 0.0, 0.0])
         self.user_translation.locateVariable(program, "translation")
@@ -470,6 +472,16 @@ class MinimalGLWidget(QOpenGLWidget):
 
         ## FINISH ERROR CHECKING
         return program
+
+    @staticmethod
+    def printSystemInfo():
+        print ("=====" * 10)
+        #info_types = [GL.GL_VENDOR, GL.GL_RENDERER, GL.GL_VERSION, GL.GL_SHADING_LANGUAGE_VERSION]
+        print("Vendor:", glGetString(GL_VENDOR).decode('utf-8'))
+        print("Renderer:", glGetString(GL_RENDERER).decode('utf-8'))
+        print("GL Support:", glGetString(GL_VERSION).decode('utf-8'))
+        print("GLSL Support:", glGetString(GL_SHADING_LANGUAGE_VERSION).decode('utf-8'))
+        print("=====" * 10)
 
 
 if __name__ == '__main__':
