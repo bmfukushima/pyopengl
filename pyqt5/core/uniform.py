@@ -36,9 +36,7 @@ class Uniform(object):
         Store data in uniform variable
         """
         # preflight
-        if self.variable_ref == -1:
-            print('no variable ref????')
-            return
+        if self.variable_ref == -1: return
 
         if self.data_type == "int":
             glUniform1i(self.variable_ref, self.data)
@@ -50,7 +48,6 @@ class Uniform(object):
             glUniform2f(self.variable_ref, *self.data)
         elif self.data_type == "vec3":
             glUniform3f(self.variable_ref, *self.data)
-            print(self.variable_ref, self.data)
         elif self.data_type == "vec4":
             glUniform4f(self.variable_ref, *self.data)
         else:

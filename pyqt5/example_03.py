@@ -135,13 +135,6 @@ class MinimalGLWidget(QOpenGLWidget):
             col_attr = Attribute("vec3", colors_list)
             col_attr.associateReference(self.program(), "vertex_color")
 
-        # self.user_translation.locateVariable(self.program(), "translation")
-        #self.user_translation.uploadData()
-
-        # Todo Why does this cause the original draw to disappear?
-        #
-        #self.doneCurrent()
-        # return
         return polygon_vao
 
     def initializeGL(self):
@@ -157,7 +150,7 @@ class MinimalGLWidget(QOpenGLWidget):
         program = MinimalGLWidget.initializeProgram()
         self.setProgram(program)
 
-        #self.user_translation = Uniform("vec3", [-0.5, 0.0, 0.0])
+        # UNIFORM | keyboard translation
         self.user_translation = Uniform("vec3", [0.0, 0.0, 0.0])
         self.user_translation.locateVariable(program, "translation")
 
@@ -208,13 +201,9 @@ class MinimalGLWidget(QOpenGLWidget):
         # preflight
         #self.setUpdateBehavior(QOpenGLWidget.PartialUpdate)
 
-        print(self._global_object_list)
         # this is drawing them on top of each other, due to new shaders
         for vao in self._global_object_list:
             glBindVertexArray(vao)
-            #self.user_translation.uploadData()
-            # self.user_translation.locateVariable(self.program(), "translation")
-            #
             glDrawArrays(self.drawType(), 0, self.drawStride())
 
         return QOpenGLWidget.paintGL(self)
@@ -267,7 +256,7 @@ class MinimalGLWidget(QOpenGLWidget):
             self.doneCurrent()
 
             # redraw
-            self.update(self._global_object_list, clear=True)
+            self.redraw(clear=True)
 
         if event.key() == Qt.Key_Q:
             self.user_translation.data = [0.25, 0.25, 0.0]
@@ -314,8 +303,10 @@ class MinimalGLWidget(QOpenGLWidget):
             #     vertex_source_code=vertex_source
             # )
 
-
         return QOpenGLWidget.keyPressEvent(self, event)
+
+    def redraw(self, clear=False):
+        self.update(self._global_object_list, clear=clear)
 
     def update(
             self,
