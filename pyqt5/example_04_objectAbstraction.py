@@ -14,6 +14,7 @@ Attribute / VAO
     Should be combined together into one object type
 """
 import logging
+import numpy
 
 from OpenGL.GL import (
     glGenVertexArrays,
@@ -144,44 +145,44 @@ class OpenGLWidget(QOpenGLWidget):
         # UNIFORM | keyboard translation
         self.createUniform("vec3", "translation", self.program(), [0.0, 0.0, 0.0])
 
-        colors = [
-            [1.0, 0.5, 0.5],
-            [0.5, 1.0, 0.5],
-            [0.5, 0.5, 1.0]
-        ]
-
-        # CREATE PRIMITIVES
-        points = [
-            [0.8, 0.8, 0.0],
-            [0.8, 0.2, 0.0],
-            [0.2, 0.2, 0.0]
-        ]
-        self.triangle0 = self.createPolygon(points, colors_list=colors)
-
-        points = [
-            [-0.4, -0.4, 0.0],
-            [-0.8, -0.2, 0.0],
-            [-0.2, -0.2, 0.0]
-
-        ]
-        self.triangle1 = self.createPolygon(points, colors_list=colors)
-
-        # polygon
-        points = [
-            [-0.5, 0.5, 0.0],
-            [-0.8, 0.8, 0.0],
-            [-0.2, 0.8, 0.0],
-        ]
-
-        self.poly = self.createPolygon(points, colors_list=colors)
-        # why did they detach the shader?
-        # will need to shaders from program?
-        #glDetachShader(program, vertex)
-        #glDetachShader(program, fragment)
-
-        glPointSize(20)
-
-        self.update([self.triangle0, self.triangle1], draw_stride=3)
+        # colors = [
+        #     [1.0, 0.5, 0.5],
+        #     [0.5, 1.0, 0.5],
+        #     [0.5, 0.5, 1.0]
+        # ]
+        #
+        # # CREATE PRIMITIVES
+        # points = [
+        #     [0.8, 0.8, 0.0],
+        #     [0.8, 0.2, 0.0],
+        #     [0.2, 0.2, 0.0]
+        # ]
+        # self.triangle0 = self.createPolygon(points, colors_list=colors)
+        #
+        # points = [
+        #     [-0.4, -0.4, 0.0],
+        #     [-0.8, -0.2, 0.0],
+        #     [-0.2, -0.2, 0.0]
+        #
+        # ]
+        # self.triangle1 = self.createPolygon(points, colors_list=colors)
+        #
+        # # polygon
+        # points = [
+        #     [-0.5, 0.5, 0.0],
+        #     [-0.8, 0.8, 0.0],
+        #     [-0.2, 0.8, 0.0],
+        # ]
+        #
+        # self.poly = self.createPolygon(points, colors_list=colors)
+        # # why did they detach the shader?
+        # # will need to shaders from program?
+        # #glDetachShader(program, vertex)
+        # #glDetachShader(program, fragment)
+        #
+        # glPointSize(20)
+        #
+        # self.update([self.triangle0, self.triangle1], draw_stride=3)
 
     def paintGL(self):
         """
@@ -200,7 +201,6 @@ class OpenGLWidget(QOpenGLWidget):
 
     def update(
             self,
-            vao_list,
             draw_stride=None,
             draw_type=None,
             clear=False,
@@ -234,7 +234,7 @@ class OpenGLWidget(QOpenGLWidget):
         return QOpenGLWidget.update(self)
 
     def redraw(self, clear=False):
-        self.update(self.global_object_list, clear=clear)
+        self.update(clear=clear)
 
     """ EVENTS ( INPUT )"""
     def keyPressEvent(self, event):
@@ -274,7 +274,7 @@ class OpenGLWidget(QOpenGLWidget):
             # redraw
             self.redraw(clear=True)
 
-            self.update(self.global_object_list)
+            #self.update()
 
             # vertex_source = """
             #     in vec3 position;
@@ -458,4 +458,54 @@ if __name__ == '__main__':
     app = QApplication([])
     widget = OpenGLWidget()
     widget.show()
+
+    # colors = [
+    #     [1.0, 0.5, 0.5],
+    #     [0.5, 1.0, 0.5],
+    #     [0.5, 0.5, 1.0]
+    # ]
+    #
+    # # CREATE PRIMITIVES
+    # points = [
+    #     [0.8, 0.8, 0.0],
+    #     [0.8, 0.2, 0.0],
+    #     [0.2, 0.2, 0.0]
+    # ]
+    # triangle0 = widget.createPolygon(points, colors_list=colors)
+    #
+    # points = [
+    #     [-0.4, -0.4, 0.0],
+    #     [-0.8, -0.2, 0.0],
+    #     [-0.2, -0.2, 0.0]
+    #
+    # ]
+    # triangle1 = widget.createPolygon(points, colors_list=colors)
+    #
+    # # polygon
+    # points = [
+    #     [-0.5, 0.5, 0.0],
+    #     [-0.8, 0.8, 0.0],
+    #     [-0.2, 0.8, 0.0],
+    # ]
+
+    # poly = widget.createPolygon(points, colors_list=colors)
+    # why did they detach the shader?
+    # will need to shaders from program?
+    # glDetachShader(program, vertex)
+    # glDetachShader(program, fragment)
+
+    glPointSize(20)
+    step = 0.01
+    for x in list(numpy.arange(0, 1, step)):
+        for y in list(numpy.arange(0, 1, step)):
+            points = [
+                [x, y, 0.0],
+                [x+step, y, 0.0],
+                [x, y+step, 0.0]
+                ]
+
+            widget.createPolygon(points, colors_list=points)
+            print (x)
+    widget.update(draw_stride=1)
+
     app.exec_()
