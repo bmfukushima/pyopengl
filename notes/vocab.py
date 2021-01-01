@@ -65,6 +65,7 @@ Rendering (process): of generating a 2D image from a 3D scene
 
 Shader (process): that is run on GPU (aka a function/program)
 
+
 Vertex Array Object
     A way to setup reusable templates for Vertex Buffers Layouts
     |-* Vertex Buffer Objects

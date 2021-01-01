@@ -24,18 +24,8 @@ from OpenGL.GL import (
     glUseProgram,
     glPointSize,
     glDrawArrays,
-    glCreateShader,
-    glShaderSource,
-    glCompileShader,
-    glGetShaderiv,
-    glGetShaderInfoLog,
-    glDeleteShader,
-    glCreateProgram,
-    glAttachShader,
-    glLinkProgram,
-    glGetProgramiv,
-    glGetProgramInfoLog,
-    glDeleteProgram,
+    glCreateShader, glShaderSource, glCompileShader, glGetShaderiv, glGetShaderInfoLog, glDeleteShader, glAttachShader,
+    glCreateProgram, glLinkProgram, glGetProgramiv, glGetProgramInfoLog, glDeleteProgram,
     glClear,
     GL_COLOR_BUFFER_BIT,
     GL_LINK_STATUS,
@@ -44,7 +34,8 @@ from OpenGL.GL import (
     GL_COMPILE_STATUS,
     GL_VERTEX_SHADER,
     GL_FRAGMENT_SHADER,
-    glGetString, GL_VENDOR, GL_RENDERER, GL_VERSION, GL_SHADING_LANGUAGE_VERSION
+    glGetString, GL_VENDOR, GL_RENDERER, GL_VERSION, GL_SHADING_LANGUAGE_VERSION,
+    glViewport, glLoadIdentity, glOrtho, glMatrixMode, GL_PROJECTION, GL_MODELVIEW
 )
 
 from PyQt5.QtWidgets import QApplication, QOpenGLWidget
@@ -57,7 +48,7 @@ from core.uniform import Uniform
 logger = logging.getLogger(__name__)
 
 
-class MinimalGLWidget(QOpenGLWidget):
+class OpenGLWidget(QOpenGLWidget):
     """
     Args:
         draw_stride (int): How many points are in the primitive type to be drawn.
@@ -102,7 +93,7 @@ class MinimalGLWidget(QOpenGLWidget):
             """
 
     def __init__(self, parent=None, draw_stride=0, draw_type=GL_POINTS):
-        super(MinimalGLWidget, self).__init__(parent)
+        super(OpenGLWidget, self).__init__(parent)
         self._global_object_list = []
         self._object_list = []
         #self._resizing = False
@@ -148,10 +139,10 @@ class MinimalGLWidget(QOpenGLWidget):
         self.setUpdateBehavior(QOpenGLWidget.PartialUpdate)
 
         # program (fragment, vertex)
-        program = MinimalGLWidget.initializeProgram()
+        program = OpenGLWidget.initializeProgram()
         self.setProgram(program)
 
-        MinimalGLWidget.printSystemInfo()
+        OpenGLWidget.printSystemInfo()
         # UNIFORM | keyboard translation
         self.user_translation = Uniform("vec3", [0.0, 0.0, 0.0])
         self.user_translation.locateVariable(program, "translation")
@@ -240,16 +231,16 @@ class MinimalGLWidget(QOpenGLWidget):
             why do uniforms just explode...
         """
         wasd = [Qt.Key_W, Qt.Key_A, Qt.Key_S, Qt.Key_D]
-        translation_amount = 0.1
+        translation_amount = 0.01
         if event.key() in wasd:
             # self.makeCurrent()
             if event.key() == Qt.Key_W:
                 self.user_translation.data[1] += translation_amount
-            elif event.key() == Qt.Key_A:
+            if event.key() == Qt.Key_A:
                 self.user_translation.data[0] -= translation_amount
-            elif event.key() == Qt.Key_S:
+            if event.key() == Qt.Key_S:
                 self.user_translation.data[1] -= translation_amount
-            elif event.key() == Qt.Key_D:
+            if event.key() == Qt.Key_D:
                 self.user_translation.data[0] += translation_amount
 
             # upload data
@@ -262,6 +253,14 @@ class MinimalGLWidget(QOpenGLWidget):
 
         if event.key() == Qt.Key_Q:
             self.user_translation.data = [0.25, 0.25, 0.0]
+
+            # upload data
+            self.makeCurrent()
+            self.user_translation.uploadData()
+            self.doneCurrent()
+
+            # redraw
+            self.redraw(clear=True)
 
             self.update(self._global_object_list)
 
@@ -346,9 +345,9 @@ class MinimalGLWidget(QOpenGLWidget):
             # does association even matter??
 
         # bind VAO
-        for vao in vao_list:
-            glBindVertexArray(vao)
-            glDrawArrays(self.drawType(), 0, self.drawStride())
+        # for vao in vao_list:
+        #     glBindVertexArray(vao)
+        #     glDrawArrays(self.drawType(), 0, self.drawStride())
 
         # update
         self.doneCurrent()
@@ -436,14 +435,14 @@ class MinimalGLWidget(QOpenGLWidget):
         ## GET SOURCE CODE
         # vertex shader
         if not vertex_source_code:
-            vertex_source_code = MinimalGLWidget.VERTEX_SHADER_DEFAULT
+            vertex_source_code = OpenGLWidget.VERTEX_SHADER_DEFAULT
         # fragment shader
         if not fragment_source_code:
-            fragment_source_code = MinimalGLWidget.FRAGMENT_SHADER_DEFAULT
+            fragment_source_code = OpenGLWidget.FRAGMENT_SHADER_DEFAULT
 
         # CREATE SHADERS
-        vertex_shader = MinimalGLWidget.initializeShader(vertex_source_code, GL_VERTEX_SHADER)
-        fragment_shader = MinimalGLWidget.initializeShader(fragment_source_code, GL_FRAGMENT_SHADER)
+        vertex_shader = OpenGLWidget.initializeShader(vertex_source_code, GL_VERTEX_SHADER)
+        fragment_shader = OpenGLWidget.initializeShader(fragment_source_code, GL_FRAGMENT_SHADER)
 
         ## CREATE PROGRAM
         program = glCreateProgram()
@@ -486,6 +485,6 @@ class MinimalGLWidget(QOpenGLWidget):
 
 if __name__ == '__main__':
     app = QApplication([])
-    widget = MinimalGLWidget()
+    widget = OpenGLWidget()
     widget.show()
     app.exec_()
