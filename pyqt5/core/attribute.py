@@ -1,3 +1,10 @@
+"""
+This file only goes until example_03
+from example_04 onwards, the objectArray is used
+    instead to define these attrs.
+
+"""
+
 import numpy
 
 from OpenGL.GL import (
