@@ -42,7 +42,7 @@ from PyQt5.QtWidgets import QApplication, QOpenGLWidget
 # from PyQt5.QtGui import QOpenGLWindow, QOpenGLVertexArrayObject
 from PyQt5.QtCore import Qt, QPoint
 
-from core.attribute import Attribute
+from core.objectArray import ObjectArray
 from core.uniform import Uniform
 
 logger = logging.getLogger(__name__)
@@ -110,24 +110,29 @@ class OpenGLWidget(QOpenGLWidget):
 
     # todo move creation of primitives into this
     def createPolygon(self, points_list, colors_list=None):
-
         # make current
         self.makeCurrent()
 
         # generate VAO and set as ACTIVE
-        polygon_vao = glGenVertexArrays(1)
-        glBindVertexArray(polygon_vao)
-
-        # setup POINTS
-        pos_attr = Attribute("vec3", points_list)
-        pos_attr.associateReference(self.program(), "position")
-
-        # setup COLOR
+        data = {"position": {"data":points_list, "data_type": "vec3"}}
         if colors_list:
-            col_attr = Attribute("vec3", colors_list)
-            col_attr.associateReference(self.program(), "vertex_color")
+            data["vertex_color"] = {"data":colors_list, "data_type": "vec3"}
+        poly = ObjectArray(init_data=data, program=self.program())
 
-        return polygon_vao
+        #self._global_object_list.append(poly)
+        # polygon_vao = glGenVertexArrays(1)
+        # glBindVertexArray(polygon_vao)
+        #
+        # # setup POINTS
+        # pos_attr = Attribute("vec3", points_list)
+        # pos_attr.associateReference(self.program(), "position")
+        #
+        # # setup COLOR
+        # if colors_list:
+        #     col_attr = Attribute("vec3", colors_list)
+        #     col_attr.associateReference(self.program(), "vertex_color")
+
+        return poly
 
     def initializeGL(self):
         """
@@ -196,7 +201,7 @@ class OpenGLWidget(QOpenGLWidget):
 
         # this is drawing them on top of each other, due to new shaders
         for vao in self._global_object_list:
-            glBindVertexArray(vao)
+            glBindVertexArray(vao.vao)
             glDrawArrays(self.drawType(), 0, self.drawStride())
 
         return QOpenGLWidget.paintGL(self)
