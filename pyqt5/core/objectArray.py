@@ -42,11 +42,8 @@ class ObjectArray(object):
         if init_data:
             glBindVertexArray(self.vao)
             for attr_name in init_data:
-                print('======')
-                print(attr_name)
                 data = init_data[attr_name]["data"]
                 data_type = init_data[attr_name]["data_type"]
-                print(data, data_type, attr_name, program)
                 self.createAttribute(data, data_type, attr_name, program)
 
     def createAttribute(self, data, data_type, name, program):
