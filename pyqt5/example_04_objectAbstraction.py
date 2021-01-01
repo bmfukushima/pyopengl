@@ -494,7 +494,7 @@ if __name__ == '__main__':
     # glDetachShader(program, vertex)
     # glDetachShader(program, fragment)
 
-    glPointSize(20)
+    glPointSize(10)
     step = 0.01
     for x in list(numpy.arange(0, 1, step)):
         for y in list(numpy.arange(0, 1, step)):
@@ -505,7 +505,11 @@ if __name__ == '__main__':
                 ]
 
             widget.createPolygon(points, colors_list=points)
-            print (x)
-    widget.update(draw_stride=1)
+            print('====')
+            print (points)
+    from OpenGL.GL import GL_TRIANGLES
+    widget.setDrawType(GL_TRIANGLES)
+    widget.setDrawStride(3)
+    widget.update(draw_stride=3)
 
     app.exec_()
