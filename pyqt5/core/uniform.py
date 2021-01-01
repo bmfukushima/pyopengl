@@ -5,7 +5,9 @@ from OpenGL.GL import (
     glUniform1f,
     glUniform2f,
     glUniform3f,
-    glUniform4f
+    glUniform4f,
+    glUniformMatrix4fv,
+    GL_TRUE
 )
 
 
@@ -13,7 +15,7 @@ class Uniform(object):
     """
     data (array): of arbitrary data
     data_type (string): what type of data is being used
-        int | float | vec2 | vec3 | vec 4
+        int | float | vec2 | vec3 | vec4 | mat4
 
     """
     def __init__(self, data_type, data):
@@ -50,5 +52,7 @@ class Uniform(object):
             glUniform3f(self.variable_ref, *self.data)
         elif self.data_type == "vec4":
             glUniform4f(self.variable_ref, *self.data)
+        elif self.data_type == "mat4":
+            glUniformMatrix4fv(self.variable_ref, 1, GL_TRUE, self.data)
         else:
              raise Exception("Unknown data type... {data_type}".format(data_type=self.data_type))
