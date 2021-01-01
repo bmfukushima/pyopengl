@@ -5,6 +5,8 @@
 CAPITAL BOLD = MATRIX
 LOWER BOLD = VECTOR
 
+Affine Transformation (): translate/rotate/scale
+
 Basis Vectors (vector): using the vectors i=<1,0> and j=<0,1>,
     any vector can be written in terms of these vectors using
     VECTOR ADDITION and SCALAR MULTIPLICATION.
@@ -15,7 +17,9 @@ Basis Vectors (vector): using the vectors i=<1,0> and j=<0,1>,
 
     This is one set of BASIS VECTORS, known as the STANDARD BASIS
 
-Dot Product: Given 2 matrixes to multiply, this returns a third matrix, consisting of
+Clip Space (coordinate system): the -1, 1 space that OpenGL draws to
+
+Dot Product (function): Given 2 matrixes to multiply, this returns a third matrix, consisting of
     the 2 original multiplied together.  The DOT PRODUCT can return any COLUMN / ROW combination
     given the formula
         Matrix1_ROW + Matrix2_COL
@@ -34,6 +38,13 @@ Linear Transformation (function): a function is considered to be a linear transf
             F(c * v) = c * F(v)
         2.) Vector Addition
             F(w + v) = F(w) + F(v)
+Matrix:
+    Global vs Local Transformation:
+        Global: global matrix * model matrix
+        Local: model matrix * local matrix
+    Model Matrix (matrix): of local coordinates to an object.
+        An object consists of its origin plus all of the transformations that are applied to it.
+        The model Matrix is the resulting matrix after all transformations have been applied.
 
 Points (coordinates): position in space
 
@@ -45,6 +56,8 @@ Scalar (number): singular number
             |- direction reversed when scalar is negative
                     positive --> top right
                     negative --> bot left
+
+Transpose (process): switching between row/column and column/row in matrixes
 
 Vector (coordinates): length/magnitude of a line segment.  This line segment does not have
     an origin point, or a termination point.
@@ -60,7 +73,8 @@ Vector / Point
 
 """
 
-"""##  LINEAR TRANSFORMATIONS
+##  LINEAR TRANSFORMATIONS
+"""
 Vector Notation
     [2, 3]
     [1, 4]
@@ -77,3 +91,63 @@ Multiplication????
         
 
 """
+
+##      SCALING TRANSFORMATIONS
+"""
+Multiplies each component of a vector by a constant
+    4x4 matrix = 0, 5, 10
+[x]   [r * x]   [r 0]   [x]
+[y] = [s * y] = [0 s] * [y]
+
+[x]   [r * x]   [r 0 0]   [x]
+[y]   [s * y]   [0 s 0]   [y]
+[z] = [t * z] = [0 0 t] * [z]
+"""
+
+##      ROTATION TRANSFORMATIONS
+"""
+Rotates vectors by a constant angle around the origin
+
+    2D
+[cos(x) -sin(x)]
+[sin(x)  cos(x)]
+
+    z-Axis              x-axis              y-axis
+[cos(x) -sin(x) 0]  [1   0       0   ]  [ cos(x) 0 sin(x)]
+[sin(x)  cos(x) 0]  [0 cos(x) -sin(0)]  [   0    1   0   ]
+[  0       0    1]  [0 sin(x)  cos(x)]  [-sin(x) 0 cos(x)]
+
+    Note:
+        * since y-axis is going up down, the orientation changes,
+            this is why the -sin/sin combo is flipped.
+    Question:
+        * how to rotate from arbitrary matrix in multiple dimensions?
+                Matrix multiplication?
+
+"""
+
+##      TRANSLATION TRANSFORMATIONS
+"""
+* Start with identity matrix
+* Embeds the current translation in a matrix of one higher dimensions
+
+    1D                      2D                      3D
+[1 m] [x]    [x+m]      [1 0 m] [x]   [x+m]     [1 0 0 m] [x]   [x+m]
+[0 1] [1] =  [ 1 ]      [0 1 n] [y]   [y+n]     [0 1 0 n] [y]   [y+n]
+                        [0 0 1] [1] = [ 1 ]     [0 0 1 p] [z]   [z+p]
+                                                [0 0 0 1] [1] = [ 1 ]
+
+* perspective division (non-linear) done after vertex shader stage
+        x, y, z, w --> (x/w, y/w, z/w)
+"""
+
+
+##      FRUSTUM
+"""
+Angle of view (angle): angle between top plane/bottom plane
+Aspect Ratio (ratio): width of near plane / height of near plane
+Far Plane (distance)
+Near Plane (distance)
+
+"""
+

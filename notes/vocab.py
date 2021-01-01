@@ -1,4 +1,6 @@
 """
+
+
 Draw Types (GL_DRAWTYPE):
     GL_POINTS | GL_LINE | GL_LINE_LOOP | GL_TRIANGLE | GL_TRIANGLE_FAN
     GL_LINE_LOOP: Connects the indexes in sequence
