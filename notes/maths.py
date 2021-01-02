@@ -40,11 +40,15 @@ Linear Transformation (function): a function is considered to be a linear transf
             F(w + v) = F(w) + F(v)
 Matrix:
     Global vs Local Transformation:
+        < Local applies local (object/model matrix)first >
         Global: global matrix * model matrix
         Local: model matrix * local matrix
     Model Matrix (matrix): of local coordinates to an object.
         An object consists of its origin plus all of the transformations that are applied to it.
         The model Matrix is the resulting matrix after all transformations have been applied.
+
+View Matrix (matrix): inverse of camera matrix
+    Used to rotate world around camera, vs rotating camera around the world
 
 Points (coordinates): position in space
 
@@ -145,6 +149,8 @@ Rotates vectors by a constant angle around the origin
 ##      FRUSTUM
 """
 Angle of view (angle): angle between top plane/bottom plane
+    Larger angle of view = larger frustum
+
 Aspect Ratio (ratio): width of near plane / height of near plane
 Far Plane (distance)
 Near Plane (distance)
