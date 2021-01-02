@@ -18,8 +18,13 @@ class Mesh(Object3D):
         # a = {"b":"2", "a": "1"}
         # for key, value in a.items():
         #     print(key, value)
+        # gen/bind vao
+        self.vao = glGenVertexArrays(1)
+        glBindVertexArray(self.vao)
+
+        # associate attr references
         for variable_name, attr_object in geometry.attributes.items():
             attr_object.associateReference(material.program, variable_name)
 
-        # unbind the VAO
+        # unbind vao
         glBindVertexArray(0)

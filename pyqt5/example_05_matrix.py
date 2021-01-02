@@ -74,6 +74,7 @@ class OpenGLWidget(QOpenGLWidget):
         -
     """
     # vertex shader
+    # TODO when updating will need to move position --> vertex_position
     VERTEX_SHADER_DEFAULT = """
             // IO
             in vec3 position;
