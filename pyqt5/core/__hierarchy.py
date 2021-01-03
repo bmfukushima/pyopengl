@@ -1,12 +1,16 @@
 """
 
+is  a    |-
+has a    |>
 
 Object3D
     |- Camera
     |- Group
     |- Mesh
-        |- Geometry
-        |- Material
+    |    |> Geometry
+    |    |    |- Rectangle
+    |    |    |- Cube
+    |    |> Material
     |- Scene
 Utils
     |- Matrix

@@ -65,3 +65,58 @@ Passing data between stages of the pipeline
             gl_Depth = ?
 
 """
+
+## SNIPPETS
+## ## 01
+"""
+void main()
+{
+  foo; // constant expressions are dynamically uniform.
+  
+  uint value = 21; // 'value' is dynamically uniform.
+  value = range.x; // still dynamically uniform.
+  value = range.y + fromRange.y; // not dynamically uniform; current contents come from a non-dynamically uniform source.
+  value = 4; // dynamically uniform again.
+  if (fromPrevious.y < 3.14)
+    value = 12;
+  value; // NOT dynamically uniform. Current contents depend on 'fromPrevious', an input variable.
+
+  float number = abs(pairs.x); // 'number' is dynamically uniform.
+  number = sin(pairs.y); // still dynamically uniform.
+  number = cos(fromPrevious.x); // not dynamically uniform.
+
+  vec4 colors = texture(tex, pairs.xy); // dynamically uniform, even though it comes from a texture.
+                                        // It uses the same texture coordinate, thus getting the same texel every time.
+  colors = texture(tex, fromPrevious.xy); // not dynamically uniform.
+
+  for(int i = range.x; i < range.y; ++i)
+  {
+       // loop initialized with, compared against, and incremented by dynamically uniform expressions.
+    i; // Therefore, 'i' is dynamically uniform, even though it changes.
+  }
+
+  for(int i = fromRange.x; i < fromRange.y; ++i)
+  {
+    i; // 'i' is not dynamically uniform; 'fromRange' is not dynamically uniform.
+  }
+}
+"""
+
+## ## FUNCTIONS
+"""
+void MyFunction(in float inputValue, out int outputValue, inout float inAndOutValue)
+{
+  inputValue = 0.0;
+  outputValue = int(inAndOutValue + inputValue);
+  inAndOutValue = 3.0;
+}
+
+void main()
+{
+  float in1 = 10.5;
+  int out1 = 5;
+  float out2 = 10.0;
+  MyFunction(in1, out1, out2);
+}
+"""
+

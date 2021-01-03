@@ -28,7 +28,7 @@ class Uniform(object):
         Get and store reference to uniform variable
 
         Args:
-            program (glProgram):
+        program (glProgram):
             variable_name (str): name of this uniform
         """
         self.variable_ref = glGetUniformLocation(program, variable_name)
