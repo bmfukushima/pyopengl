@@ -4,7 +4,6 @@ from .object import Mesh
 
 
 class Renderer(object):
-
     def __init__(self, clear_color=[0, 0, 0, 0]):
         glEnable(GL_DEPTH_TEST)
         glClearColor(*clear_color)
@@ -50,6 +49,6 @@ class Renderer(object):
             mesh.material.updateRenderSettings()
 
             # draw arrays
-            glDrawArrays( mesh.material.settings["draw_style"], 0, mesh.geometry.vertex_count)
+            glDrawArrays(mesh.material.settings["draw_style"], 0, mesh.geometry.vertex_count)
 
 

@@ -18,6 +18,14 @@ class AbstractMaterial(object):
             defaults:
                 draw_style
             {setting_name: value}
+
+    Uniforms:
+        model_matrix (mat4)
+        view_matrix (mat4)
+        proj_matrix (mat4)
+
+    Settings:
+        draw_style
     """
     def __init__(self, vertex_shader=None, fragment_shader=None):
 

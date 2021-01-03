@@ -25,7 +25,7 @@
 ################################################################################
 """
 
-from core.geometry.geometry import Geometry
+from .geometry import Geometry
 from core.utils import Attribute
 
 
@@ -33,8 +33,8 @@ class Rectangle(Geometry):
     """
 
     Args:
-        width (int)
-        height (int)
+        width (int):
+        height (int):
     """
     def __init__(self, width=1, height=1):
         super().__init__()

@@ -1,8 +1,14 @@
-from core.geometry.geometry import Geometry
+from .geometry import Geometry
 from core.utils import Attribute
 
 
 class Cube(Geometry):
+    """
+    Args:
+        width (int):
+        height (int):
+        depth (int):
+    """
     def __init__(self, width=1, height=1, depth=1):
         super().__init__()
 

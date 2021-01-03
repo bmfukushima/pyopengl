@@ -3,8 +3,8 @@ from core.renderer import Renderer
 from core.object import Scene
 from core.object import Camera
 from core.object import Mesh
-from core.geometry.cube import Cube
-from core.material.mesh_mat import MeshMaterial
+from core.geometry import Cube
+from core.material import MeshMaterial
 
 from qtpy.QtWidgets import QOpenGLWidget
 from qtpy.QtCore import QTimer

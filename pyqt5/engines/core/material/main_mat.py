@@ -5,7 +5,7 @@ from core.utils import Uniform
 class MainMaterial(AbstractMaterial):
     """
     Uniforms:
-        base_color (color)
+        base_color (vec3)
         use_vertex_color (bool)
     """
     def __init__(self):

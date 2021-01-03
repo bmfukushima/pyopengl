@@ -1,6 +1,5 @@
 class Geometry(object):
     """
-
     Properties:
         attributes (dict): of Vertex Attributes
             {name: object}
