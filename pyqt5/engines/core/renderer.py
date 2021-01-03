@@ -1,6 +1,6 @@
 from OpenGL.GL import *
 
-from .object.mesh import Mesh
+from .object import Mesh
 
 
 class Renderer(object):

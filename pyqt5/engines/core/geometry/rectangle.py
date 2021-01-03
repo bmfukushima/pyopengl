@@ -26,7 +26,7 @@
 """
 
 from core.geometry.geometry import Geometry
-from core.attribute import Attribute
+from core.utils import Attribute
 
 
 class Rectangle(Geometry):

@@ -1,8 +1,8 @@
 #from core.base?
 from core.renderer import Renderer
-from core.object.scene import Scene
-from core.object.camera import Camera
-from core.object.mesh import Mesh
+from core.object import Scene
+from core.object import Camera
+from core.object import Mesh
 from core.geometry.cube import Cube
 from core.material.mesh_mat import MeshMaterial
 
@@ -38,8 +38,8 @@ class OpenGLWidget(QOpenGLWidget):
     def paintGL(self):
         #self.makeCurrent()
         self.mesh.translate
-        #self.mesh.rotateX(0.0337)
-        #self.mesh.rotateY(0.0514)
+        self.mesh.rotateX(0.0337)
+        self.mesh.rotateY(0.0514)
         self.renderer.render(self.scene, self.camera)
         self.camera.rotateY(0.05, local_coord=False)
         self.camera.translate(0, 0, 0.5)
@@ -52,10 +52,12 @@ class OpenGLWidget(QOpenGLWidget):
 
 if __name__ == "__main__":
     from qtpy.QtWidgets import QApplication
+    from qtpy.QtGui import QCursor
     import sys
 
     app = QApplication([])
     widget = OpenGLWidget()
     widget.show()
+    widget.move(QCursor.pos())
 
     app.exec_()

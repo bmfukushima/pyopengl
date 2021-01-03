@@ -1,5 +1,5 @@
 from .object3D import Object3D
-from core.utils.matrix import Matrix
+from core.utils import Matrix
 from numpy.linalg import inv
 
 

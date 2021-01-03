@@ -3,7 +3,7 @@ todo
     * scale is only setup as uniform
 """
 
-from core.utils.matrix import Matrix
+from core.utils import Matrix
 
 
 class Object3D(object):

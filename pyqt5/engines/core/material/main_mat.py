@@ -1,5 +1,5 @@
 from .abstract_mat import AbstractMaterial
-from core.uniform import Uniform
+from core.utils import Uniform
 
 
 class MainMaterial(AbstractMaterial):

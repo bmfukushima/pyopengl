@@ -1,5 +1,5 @@
 from core.utils import Utils
-from core.uniform import Uniform
+from core.utils import Uniform
 
 
 class AbstractMaterial(object):
