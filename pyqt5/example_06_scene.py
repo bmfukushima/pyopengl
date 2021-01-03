@@ -37,9 +37,12 @@ class OpenGLWidget(QOpenGLWidget):
 
     def paintGL(self):
         #self.makeCurrent()
-        self.mesh.rotateX(0.0337)
-        self.mesh.rotateY(0.0514)
+        self.mesh.translate
+        #self.mesh.rotateX(0.0337)
+        #self.mesh.rotateY(0.0514)
         self.renderer.render(self.scene, self.camera)
+        self.camera.rotateY(0.05, local_coord=False)
+        self.camera.translate(0, 0, 0.5)
         #self.doneCurrent()
 
         self._startTimer()
