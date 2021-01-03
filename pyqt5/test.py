@@ -4,12 +4,8 @@ from core.mesh import Mesh
 from core.geometry.rectangle import Rectangle
 
 a = Rectangle()
-print(a)
 
-colors = \
-    ['1'] * 3 \
-    + ['2'] * 3 \
+a = {'a':1, 'b':2}
 
-
-print(['1'] * 3)
-print (colors)
+for x in a.values():
+    print(x)

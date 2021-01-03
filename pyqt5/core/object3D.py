@@ -25,9 +25,10 @@ class Object3D(object):
 
     def getWorldMatrix(self):
         """
-        # calculate transformation of this Object3D relative
-        #   to the root Object3D of the scene graph
-        Returns:
+        calculate transformation of this Object3D relative
+        to the root Object3D of the scene graph
+
+        Returns (mat4):
 
         """
 
@@ -37,6 +38,9 @@ class Object3D(object):
             return self.parent.getWorldMatrix() @ self.transform
 
     def getDescendentList(self):
+        """
+        Returns (list): of all descendents of this object
+        """
         descendents = []
 
         _nodes_to_process = [self]

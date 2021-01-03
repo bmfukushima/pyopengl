@@ -1,5 +1,6 @@
-from .object3D import Object3D
 from OpenGL.GL import *
+
+from .object3D import Object3D
 
 
 class Mesh(Object3D):

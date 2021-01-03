@@ -14,13 +14,12 @@ class Matrix(object):
         returns (4x4 matrix)
             a numpy array of floats
         """
-        identity = numpy.array([
+        return numpy.array([
             [1, 0, 0, 0],
             [0, 1, 0, 0],
             [0, 0, 1, 0],
             [0, 0, 0, 1]
         ]).astype(float)
-        return identity
 
     @staticmethod
     def makeTranslation(x, y, z):

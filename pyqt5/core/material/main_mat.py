@@ -3,12 +3,17 @@ from core.uniform import Uniform
 
 
 class MainMaterial(AbstractMaterial):
+    """
+    Uniforms:
+        base_color (color)
+        use_vertex_color (bool)
+    """
     def __init__(self):
         # Create Shaders
         vertex_shader = """
-            uniform vec4 proj_matrix;
-            uniform vec4 model_matrix;
-            uniform vec4 view_matrix;
+            uniform mat4 proj_matrix;
+            uniform mat4 model_matrix;
+            uniform mat4 view_matrix;
             
             in vec3 vertex_position;
             in vec3 vertex_color;
@@ -24,19 +29,20 @@ class MainMaterial(AbstractMaterial):
         """
         fragment_shader = """
         uniform vec3 base_color;
-        uniform bool use_vertex_colors;
+        uniform bool use_vertex_color;
         in vec3 color;
         // not sure... if this is how this should work lol
-        //out vec4 fragColor;
+        out vec4 fragColor;
         
         void main()
         {
             vec4 temp_color = vec4(base_color, 1.0);
             
-            if ( use_vertex_colors )
+            if ( use_vertex_color )
                 temp_color *= vec4(color, 1.0);
                 
-            gl_FragColor = temp_color;
+            // gl_FragColor = temp_color;
+            fragColor = temp_color;
         }
         """
 

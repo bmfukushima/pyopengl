@@ -63,6 +63,15 @@ See glsl.py --> TYPE MODIFIERS
 #       APPLICATION
 """
 CPU Portion before sending to GPU
+
+Creating an application
+Base
+Renderer
+Scene
+Camera
+Mesh
+atleast one geometry class
+atleast one material class
 """
 
 

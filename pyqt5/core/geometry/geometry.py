@@ -8,16 +8,17 @@ class Geometry(object):
     """
     def __init__(self):
         self.attributes = {}
-        self.vertex_count = None
+        self.vertex_count = 1
 
     def vertexCount(self):
         """
         Returns the vertex count.
 
-        The vertex count is the length of any attribute object
+        The vertex count is the length of any attribute objects data,
+        as there is attribute per vertex.
 
         """
 
         attrib = list(self.attributes.values())[0]
 
-        self.vertex_count = len(attrib)
+        self.vertex_count = len(attrib.data)

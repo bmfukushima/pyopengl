@@ -2,9 +2,10 @@ from OpenGL.GL import *
 
 from .mesh import Mesh
 
+
 class Renderer(object):
 
-    def __init__(self, clear_color=[0, 0, 0]):
+    def __init__(self, clear_color=[0, 0, 0, 0]):
         glEnable(GL_DEPTH_TEST)
         glClearColor(*clear_color)
 
@@ -37,6 +38,18 @@ class Renderer(object):
             glBindVertexArray(mesh.vao)
 
             # update uniform matrices
+            mesh.material.uniforms["model_matrix"].data = mesh.getWorldMatrix()
+            mesh.material.uniforms["proj_matrix"].data = camera.projection_matrix
+            mesh.material.uniforms["view_matrix"].data = camera.view_matrix
 
+            # update all uniforms in the material
+            for _, uniform in mesh.material.uniforms.items():
+                uniform.uploadData()
+
+            # update render settings
+            mesh.material.updateRenderSettings()
+
+            # draw arrays
+            glDrawArrays( mesh.material.settings["draw_style"], 0, mesh.geometry.vertex_count)
 
 

@@ -39,6 +39,7 @@ class Rectangle(Geometry):
     def __init__(self, width=1, height=1):
         super().__init__()
 
+        # points
         p0 = [-width/2, -height/2, 0]
         p1 = [ width/2, -height/2, 0]
         p2 = [-width/2,  height/2, 0]
@@ -51,11 +52,11 @@ class Rectangle(Geometry):
 
         self.attributes["vertex_position"] = Attribute("vec3", points_list)
 
+        # colors
         c0 = [1, 1, 1]
         c1 = [1, 0, 0]
         c2 = [0, 1, 0]
         c3 = [0, 0, 1]
-
 
         colors_list = [
             c0, c1, c2,
@@ -63,3 +64,6 @@ class Rectangle(Geometry):
         ]
 
         self.attributes["vertex_color"] = Attribute("vec3", colors_list)
+
+        # setup initial vertex count (required for renderer)
+        self.vertexCount()
